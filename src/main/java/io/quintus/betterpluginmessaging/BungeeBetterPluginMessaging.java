@@ -3,6 +3,7 @@ package io.quintus.betterpluginmessaging;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import com.sun.deploy.util.StringUtils;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ConnectedPlayer;
@@ -13,6 +14,8 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.Util;
+
+import java.util.logging.Level;
 
 public class BungeeBetterPluginMessaging extends Plugin implements Listener {
 
@@ -31,6 +34,7 @@ public class BungeeBetterPluginMessaging extends Plugin implements Listener {
         ByteArrayDataInput in = ByteStreams.newDataInput(event.getData());
         String subchannel = in.readUTF();
         String[] components = subchannel.split("::", 2);
+        getLogger().log(Level.INFO, subchannel);
         if (components.length < 2) { return; }
 
         Server server = (Server)event.getSender();
@@ -88,7 +92,7 @@ public class BungeeBetterPluginMessaging extends Plugin implements Listener {
                 break;
 
             case "UUID":
-                targetPlayer = (ConnectedPlayer)event.getReceiver();
+                targetPlayer = (ProxiedPlayer)event.getReceiver();
                 out.writeUTF(subchannel);
                 out.writeUTF(targetPlayer.getUniqueId().toString());
                 break;
@@ -96,6 +100,7 @@ public class BungeeBetterPluginMessaging extends Plugin implements Listener {
             case "UUIDOther":
                 String playerName = in.readUTF();
                 targetPlayer = proxy.getPlayer(playerName);
+                getLogger().log(Level.INFO, playerName);
                 out.writeUTF(subchannel);
                 out.writeUTF(targetPlayer.getName());
                 out.writeUTF(targetPlayer.getUniqueId().toString());
@@ -110,7 +115,8 @@ public class BungeeBetterPluginMessaging extends Plugin implements Listener {
                 out.writeShort(targetServer.getAddress().getPort());
                 break;
 
-            default: return;
+            default:
+                return;
         }
 
         byte[] b = out.toByteArray();
