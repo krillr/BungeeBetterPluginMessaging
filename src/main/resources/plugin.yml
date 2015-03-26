@@ -1,0 +1,4 @@
+name: BungeeBetterPluginMessaging
+main: io.quintus.betterpluginmessaging.BungeeBetterPluginMessaging
+version: 1.0-SNAPSHOT
+author: __kazu__
